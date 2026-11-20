@@ -1,0 +1,2823 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的美食日常 - 餐廳與餐點</title>
+  <!-- Google Fonts: Noto Serif TC & Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-main: #FDFBF7;
+      --bg-sidebar: #F5E6CC;
+      --bg-card: #FFFFFF;
+      --border-card: #D9C3B0;
+      --text-primary: #5A3825;
+      --text-secondary: #7D6252;
+      --btn-orange: #EC7622;
+      --btn-orange-hover: #D46517;
+      --btn-sec-bg: #F7F1E8;
+      --btn-sec-border: #C8B29E;
+      --nav-active-bg: #F2DEC1;
+      --nav-active-accent: #C15B1B;
+      --member-pill-bg: #F5DFBB;
+      --banner-bg: #FBF1DF;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .font-serif-title {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 700;
+    }
+
+    /* 自訂暖色捲軸 */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F6ECE0;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #C8B29E;
+      border-radius: 999px;
+    }
+
+    /* 手機版頂部列 */
+    .mobile-header {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      width: 100%;
+      background-color: var(--bg-sidebar);
+      border-bottom: 1px solid #E3CEAE;
+      padding: 12px 16px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mobile-menu-btn {
+      background: none;
+      border: 1px solid var(--btn-sec-border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      color: var(--text-primary);
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* 左側固定導覽列 (桌機版 210px) */
+    .sidebar {
+      width: 210px;
+      flex-shrink: 0;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid #E5D1B3;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 24px 12px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 50;
+      transition: transform 0.25s ease;
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .member-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background-color: var(--member-pill-bg);
+      border: 1px solid rgba(200, 178, 158, 0.5);
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      margin-bottom: 16px;
+      transition: background-color 0.2s ease;
+    }
+    .member-pill:hover {
+      background-color: #EED2A6;
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      user-select: none;
+    }
+    .nav-item:hover {
+      background-color: rgba(242, 222, 193, 0.6);
+      color: var(--text-primary);
+    }
+    .nav-item.active {
+      background-color: var(--nav-active-bg);
+      color: var(--nav-active-accent);
+      font-weight: 700;
+    }
+    .nav-item .diamond {
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .sidebar-footer {
+      margin-top: 24px;
+      padding: 12px 10px 4px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+    .sidebar-footer p {
+      margin: 0;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(45, 28, 16, 0.35);
+      z-index: 45;
+    }
+
+    /* 右側主內容區 */
+    .main-content {
+      flex: 1;
+      min-width: 0;
+      padding: 32px 36px 56px;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* 頁面標題區 */
+    .page-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .page-subtitle-top {
+      font-size: 13px;
+      color: var(--text-secondary);
+      letter-spacing: 0.12em;
+      margin: 0 0 6px;
+    }
+    .page-title {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 700;
+      font-size: 32px;
+      color: var(--text-primary);
+      letter-spacing: 0.08em;
+      margin: 0 0 10px;
+    }
+    .page-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* 通用白底邊框卡片 */
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -6px rgba(90, 56, 37, 0.13);
+    }
+
+    /* 搜尋卡片 */
+    .search-box-card {
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+    .text-input, .select-input, .textarea-input {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text-primary);
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-card);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .text-input::placeholder, .textarea-input::placeholder {
+      color: #A08675;
+    }
+    .text-input:focus, .select-input:focus, .textarea-input:focus {
+      border-color: var(--btn-orange);
+      box-shadow: 0 0 0 3px rgba(236, 118, 34, 0.16);
+    }
+
+    .count-text {
+      margin: 12px 0 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* 按鈕樣式 */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background-color: var(--btn-orange);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+    .btn-primary:hover {
+      background-color: var(--btn-orange-hover);
+    }
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background-color: var(--btn-sec-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--btn-sec-border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .btn-secondary:hover {
+      background-color: #EDE1D0;
+      border-color: #B49A82;
+    }
+
+    .btn-full {
+      width: 100%;
+    }
+
+    /* 4 欄響應式網格 (>= 1200px 顯示 4 欄並排) */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    /* 餐廳卡片內部排版 */
+    .store-card {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .store-img-wrap {
+      width: 100%;
+      height: 155px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(217, 195, 176, 0.7);
+      background-color: #F5E6CC;
+      margin-bottom: 14px;
+    }
+    .store-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .store-card:hover .store-img-wrap img {
+      transform: scale(1.04);
+    }
+    .store-title {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--text-primary);
+      line-height: 1.4;
+      margin: 0 0 10px;
+    }
+    .store-meta {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0 0 16px;
+    }
+    .store-meta p {
+      margin: 0 0 6px;
+    }
+
+    /* 詳情頁樣式 */
+    .rating-summary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    .star-buttons {
+      display: inline-flex;
+      gap: 2px;
+    }
+    .star-btn {
+      background: none;
+      border: none;
+      padding: 0 2px;
+      font-size: 20px;
+      cursor: pointer;
+      color: #C8B29E;
+      transition: transform 0.15s ease, color 0.15s ease;
+    }
+    .star-btn.filled {
+      color: var(--btn-orange);
+    }
+    .star-btn:hover {
+      transform: scale(1.15);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      padding: 4px 0;
+      margin-bottom: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .back-link:hover {
+      color: var(--btn-orange);
+    }
+
+    .detail-info-card {
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .detail-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 26px;
+      align-items: start;
+    }
+    .detail-hero-img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border-card);
+      background-color: #F5E6CC;
+    }
+    .detail-hero-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .detail-section-heading {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--text-primary);
+      margin: 0 0 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .official-link {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--btn-orange);
+      text-decoration: none;
+    }
+    .official-link:hover {
+      text-decoration: underline;
+    }
+
+    .info-dl {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 14px;
+    }
+    .info-row {
+      display: grid;
+      grid-template-columns: 82px 1fr;
+      gap: 10px;
+      line-height: 1.55;
+    }
+    .info-row dt {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .info-row dd {
+      margin: 0;
+      color: var(--text-secondary);
+    }
+
+    .detail-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .map-card {
+      height: 320px;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+    .map-card iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    .section-block {
+      margin-bottom: 34px;
+    }
+
+    /* 餐點卡片 */
+    .dish-card {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .dish-img-wrap {
+      width: 100%;
+      height: 145px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(217, 195, 176, 0.7);
+      background-color: #F5E6CC;
+      margin-bottom: 12px;
+    }
+    .dish-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .dish-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 6px;
+    }
+    .dish-cal {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin: 0 0 12px;
+    }
+    .record-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.2s ease;
+    }
+    .record-btn:hover, .record-btn.recorded {
+      color: var(--btn-orange);
+    }
+
+    /* 無評論提示橫幅 */
+    .empty-notice-banner {
+      background-color: var(--banner-bg);
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    /* 分享評論表單與卡片 */
+    .form-card {
+      padding: 26px 28px;
+      margin-bottom: 32px;
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .rating-fieldset {
+      border: 1px solid var(--border-card);
+      border-radius: 8px;
+      padding: 12px 16px 14px;
+      margin: 0 0 18px;
+      background-color: #FFFFFF;
+    }
+    .rating-fieldset legend {
+      padding: 0 6px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding-top: 4px;
+    }
+    .radio-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+    .radio-label input[type="radio"] {
+      accent-color: var(--btn-orange);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .review-card {
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 185px;
+    }
+    .review-store-name {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text-primary);
+      margin: 0 0 10px;
+      line-height: 1.4;
+    }
+    .review-stars-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .review-stars {
+      color: var(--btn-orange);
+      font-size: 15px;
+      letter-spacing: 2px;
+    }
+    .review-score {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+    .review-body {
+      font-size: 13.5px;
+      color: var(--text-primary);
+      line-height: 1.6;
+      margin: 0 0 14px;
+      word-break: break-word;
+    }
+    .review-footer {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* 詳情頁單店評論列表 */
+    .detail-review-item {
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+    .detail-review-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .author-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+    .author-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background-color: var(--nav-active-bg);
+      border: 1px solid var(--border-card);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--nav-active-accent);
+    }
+
+    /* 收藏頁面連結 */
+    .view-dishes-link {
+      display: inline-block;
+      margin-top: 10px;
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .view-dishes-link:hover {
+      color: var(--btn-orange);
+    }
+
+    /* Toast 提示訊息 */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background-color: var(--text-primary);
+      color: #FDFBF7;
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: 1px solid var(--border-card);
+      font-size: 13.5px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      max-width: 92vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--btn-orange);
+      flex-shrink: 0;
+    }
+
+    /* ========================================================= */
+    /* 美食轉盤專屬樣式                                           */
+    /* ========================================================= */
+    .wheel-main-card {
+      background-color: #FFFFFF;
+      border: 1px solid #D4BFA8;
+      border-radius: 16px;
+      padding: 36px 40px;
+      margin-bottom: 32px;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .wheel-left-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wheel-stage {
+      position: relative;
+      width: 256px;
+      height: 256px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 12 點鐘方向朝下的實心暖棕色三角形指針 */
+    .wheel-pointer {
+      position: absolute;
+      top: -9px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 11px solid transparent;
+      border-right: 11px solid transparent;
+      border-top: 20px solid #A0622D;
+      z-index: 15;
+      filter: drop-shadow(0 2px 3px rgba(90, 56, 37, 0.25));
+      pointer-events: none;
+    }
+
+    .wheel-outer-ring {
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      border: 6px solid #A88B6E;
+      box-shadow: 0 6px 18px rgba(90, 56, 37, 0.12);
+      overflow: hidden;
+      position: relative;
+      background-color: #F4E3C3;
+    }
+
+    .wheel-svg-rotor {
+      width: 100%;
+      height: 100%;
+      display: block;
+      transform: rotate(0deg);
+      will-change: transform;
+    }
+
+    /* 正中央圓形白底徽章 (直徑 72px) */
+    .wheel-center-badge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background-color: #FFFFFF;
+      border: 1px solid #CBB6A0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #6B4C35;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(90, 56, 37, 0.1);
+      user-select: none;
+    }
+
+    .wheel-spin-btn {
+      width: 220px;
+      padding: 11px 24px;
+      background-color: #EB7B26;
+      color: #FFFFFF;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease, opacity 0.2s ease;
+    }
+    .wheel-spin-btn:hover:not(:disabled) {
+      background-color: #D46517;
+    }
+    .wheel-spin-btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+    .wheel-spin-btn:disabled {
+      opacity: 0.72;
+      cursor: not-allowed;
+    }
+
+    /* 右側抽選結果面板 */
+    .wheel-result-panel {
+      background-color: #FDF4E3;
+      border: 1px solid #DFC9AF;
+      border-radius: 12px;
+      padding: 28px 32px;
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .wheel-result-heading {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #6B4C35;
+      margin: 0 0 10px;
+    }
+
+    .wheel-result-desc {
+      font-size: 14px;
+      color: #7A624D;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .wheel-winner-name {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #6B4C35;
+      margin: 0 0 8px;
+      line-height: 1.4;
+    }
+
+    .wheel-winner-meta {
+      font-size: 13.5px;
+      color: #7A624D;
+      line-height: 1.6;
+      margin: 0 0 16px;
+    }
+
+    /* 下方全部可抽選店家網格 */
+    .wheel-stores-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 16px;
+    }
+
+    .wheel-store-card {
+      background-color: #FFFFFF;
+      border: 1px solid #DFC9AF;
+      border-radius: 12px;
+      padding: 22px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 152px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .wheel-store-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -6px rgba(90, 56, 37, 0.13);
+    }
+
+    .wheel-store-card.highlighted {
+      border: 2px solid #EB7B26;
+      background-color: #FFF9F0;
+      box-shadow: 0 8px 22px -4px rgba(235, 123, 38, 0.26);
+    }
+
+    .wheel-store-card-title {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: #6B4C35;
+      line-height: 1.45;
+      margin: 0 0 20px;
+    }
+
+    .wheel-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: flex-start;
+      background-color: #EB7B26;
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+    .wheel-nav-btn:hover {
+      background-color: #D46517;
+    }
+
+    /* ========================================================= */
+    /* 新增餐廳 (AI 智慧建檔) 專屬樣式                             */
+    /* ========================================================= */
+    .ai-form-card {
+      background-color: #FCF9F4;
+      border: 1px solid #C8AD8D;
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 28px;
+      box-shadow: 0 4px 16px rgba(90, 56, 37, 0.05);
+    }
+
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #F5E6CC;
+      border: 1px solid #D9C3B0;
+      color: #8B4A1E;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+
+    .ai-loading-box {
+      margin-top: 18px;
+      padding: 16px 20px;
+      background-color: #FBF1DF;
+      border: 1px dashed #C8AD8D;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+
+    .ai-spinner {
+      width: 22px;
+      height: 22px;
+      border: 3px solid #E5D1B3;
+      border-top-color: var(--btn-orange);
+      border-radius: 50%;
+      animation: aiSpin 0.85s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes aiSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    .ai-preview-card {
+      background-color: #FFFFFF;
+      border: 1.5px solid #EC7622;
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 32px;
+      box-shadow: 0 10px 26px -8px rgba(236, 118, 34, 0.22);
+    }
+
+    .ai-preview-grid {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .ai-preview-img {
+      width: 100%;
+      height: 175px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border-card);
+      background-color: #F5E6CC;
+    }
+
+    .ai-preview-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .ai-dish-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .ai-dish-pill {
+      background-color: #FBF1DF;
+      border: 1px solid #DFC9AF;
+      color: var(--text-primary);
+      font-size: 12.5px;
+      padding: 4px 11px;
+      border-radius: 999px;
+      font-weight: 500;
+    }
+
+    .manage-store-row {
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .manage-store-row:hover {
+      border-color: #B99B7E;
+      box-shadow: 0 4px 14px -4px rgba(90, 56, 37, 0.1);
+    }
+
+    .manage-store-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .manage-store-tag {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 999px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .manage-store-tag.builtin {
+      background-color: #F2DEC1;
+      color: #7D6252;
+    }
+
+    .manage-store-tag.custom {
+      background-color: #FCE6D4;
+      color: #C15B1B;
+    }
+
+    .btn-danger-outline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background-color: #FFF6F4;
+      color: #B83B2B;
+      border: 1px solid #E3A89F;
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-danger-outline:hover {
+      background-color: #FDE5E1;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* 響應式斷點 */
+    @media (max-width: 1199px) {
+      .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 860px) {
+      .detail-info-grid {
+        grid-template-columns: 1fr;
+      }
+      .wheel-main-card {
+        grid-template-columns: 1fr;
+        padding: 28px 20px;
+        gap: 24px;
+      }
+      .ai-preview-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 767px) {
+      body {
+        flex-direction: column;
+      }
+      .mobile-header {
+        display: flex;
+      }
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .sidebar-overlay.open {
+        display: block;
+      }
+      .main-content {
+        padding: 22px 16px 44px;
+      }
+      .grid-4 {
+        grid-template-columns: 1fr;
+      }
+      .page-title {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 手機版頂部導覽列 -->
+  <header class="mobile-header">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button type="button" class="mobile-menu-btn" onclick="toggleSidebar(true)" aria-label="開啟選單">☰</button>
+      <span class="font-serif-title" style="font-size:17px;">我的美食日常</span>
+    </div>
+  </header>
+
+  <!-- 手機版側邊欄遮罩 -->
+  <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar(false)"></div>
+
+  <!-- 左側固定導覽列 (210px) -->
+  <aside id="sidebar" class="sidebar">
+    <div>
+      <nav class="nav-list" aria-label="主導覽選單">
+        <a id="nav-wheel" class="nav-item" onclick="switchView('wheel')"><span class="diamond">◇</span><span>美食轉盤</span></a>
+        <a id="nav-list" class="nav-item active" onclick="switchView('list')"><span class="diamond">◇</span><span>餐廳與餐點</span></a>
+        <a id="nav-favorites" class="nav-item" onclick="switchView('favorites')"><span class="diamond">◇</span><span>收藏店家</span></a>
+        <a id="nav-reviews" class="nav-item" onclick="switchView('reviews')"><span class="diamond">◇</span><span>分享評論</span></a>
+        <a id="nav-add-restaurant" class="nav-item" onclick="switchView('add-restaurant')"><span class="diamond">◇</span><span>新增餐廳</span></a>
+      </nav>
+    </div>
+
+    <div class="sidebar-footer">
+      <p>記下每一餐</p>
+      <p>收藏你的美食日常</p>
+    </div>
+  </aside>
+
+  <!-- 右側主內容區 -->
+  <main class="main-content">
+    <div class="container">
+
+      <!-- ========================================================= -->
+      <!-- 視圖 1：餐廳與餐點 (List View)                              -->
+      <!-- ========================================================= -->
+      <section id="view-list">
+        <header class="page-header">
+          <p class="page-subtitle-top">我的美食日常</p>
+          <h1 class="page-title">餐廳與餐點</h1>
+          <p class="page-desc">資料來源：店家資料全.xlsx。價格與熱量為參考資料，尚未核實。</p>
+        </header>
+
+        <div class="card search-box-card">
+          <label for="listSearchInput" class="form-label">搜尋餐廳</label>
+          <input
+            id="listSearchInput"
+            type="text"
+            class="text-input"
+            placeholder="輸入餐廳名稱"
+            oninput="renderListView()"
+          />
+          <p id="listCountText" class="count-text">共 4 間餐廳</p>
+        </div>
+
+        <div id="listGrid" class="grid-4"></div>
+
+        <div id="listEmptyState" class="card hidden" style="padding:36px;text-align:center;">
+          <p style="font-weight:700;margin:0 0 8px;">找不到符合條件的餐廳</p>
+          <p style="font-size:13px;color:var(--text-secondary);margin:0 0 16px;">請嘗試搜尋其他餐廳名稱、地區或餐點關鍵字</p>
+          <button type="button" class="btn-secondary" onclick="document.getElementById('listSearchInput').value='';renderListView();">顯示全部餐廳</button>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- 視圖 2：餐廳詳情頁 (Detail View)                            -->
+      <!-- ========================================================= -->
+      <section id="view-detail" class="hidden">
+        <header class="page-header" style="margin-bottom:16px;">
+          <p class="page-subtitle-top">我的美食日常</p>
+          <h1 id="detailTitle" class="page-title">東坡醉月餐館</h1>
+          <div class="rating-summary">
+            <div class="star-buttons" id="detailStarButtons">
+              <button type="button" class="star-btn" data-star="1" onclick="rateStore(1)" aria-label="1星">☆</button>
+              <button type="button" class="star-btn" data-star="2" onclick="rateStore(2)" aria-label="2星">☆</button>
+              <button type="button" class="star-btn" data-star="3" onclick="rateStore(3)" aria-label="3星">☆</button>
+              <button type="button" class="star-btn" data-star="4" onclick="rateStore(4)" aria-label="4星">☆</button>
+              <button type="button" class="star-btn" data-star="5" onclick="rateStore(5)" aria-label="5星">☆</button>
+            </div>
+            <span id="detailRatingLabel">尚無評分</span>
+          </div>
+        </header>
+
+        <button type="button" class="back-link" onclick="switchView('list')">
+          <span>←</span><span>返回搜尋結果</span>
+        </button>
+
+        <div class="card detail-info-card">
+          <div class="detail-info-grid">
+            <div class="detail-hero-img">
+              <img
+                id="detailImage"
+                src=""
+                alt="餐廳圖片"
+                onerror="this.onerror=null;this.src='https://placehold.co/800x500/F5E6CC/5A3825?text=%E9%A4%90%E5%BB%B3%E5%9C%96%E7%89%87';"
+              />
+            </div>
+
+            <div>
+              <h2 class="detail-section-heading">
+                <span>店家資訊</span>
+                <a id="detailWebsiteLink" href="#" target="_blank" rel="noopener noreferrer" class="official-link">官方網站 ↗</a>
+              </h2>
+
+              <dl class="info-dl">
+                <div class="info-row">
+                  <dt>地址</dt>
+                  <dd id="detailAddress"></dd>
+                </div>
+                <div class="info-row">
+                  <dt>訂位電話</dt>
+                  <dd id="detailPhone"></dd>
+                </div>
+                <div class="info-row">
+                  <dt>參考消費</dt>
+                  <dd id="detailPrice"></dd>
+                </div>
+                <div class="info-row">
+                  <dt>步行時間</dt>
+                  <dd id="detailWalk"></dd>
+                </div>
+                <div class="info-row">
+                  <dt>營業時間</dt>
+                  <dd id="detailHours"></dd>
+                </div>
+                <div class="info-row">
+                  <dt>出餐速度</dt>
+                  <dd id="detailPrep"></dd>
+                </div>
+                <div class="info-row">
+                  <dt>招牌餐點</dt>
+                  <dd id="detailSignature"></dd>
+                </div>
+              </dl>
+
+              <div class="detail-actions">
+                <a id="detailMapBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary">
+                  開啟 Google 地圖
+                </a>
+                <button id="detailFavBtn" type="button" class="btn-secondary" onclick="toggleFavorite(currentStoreId)">
+                  收藏店家
+                </button>
+                <button type="button" class="btn-secondary" onclick="goToReviewForStore(currentStoreId)">
+                  分享評論
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Google 地圖嵌入卡片 -->
+        <div class="card map-card">
+          <iframe
+            id="detailMapIframe"
+            title="餐廳地圖"
+            src=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+
+        <!-- 店家餐點區塊 -->
+        <div id="detail-dishes-section" class="section-block">
+          <h2 class="detail-section-heading">
+            <span>店家餐點</span>
+            <span id="detailDishesCount" style="font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:400;color:var(--text-secondary);">共 6 道餐點</span>
+          </h2>
+          <div id="detailDishesGrid" class="grid-4"></div>
+        </div>
+
+        <!-- 會員評論區塊 -->
+        <div class="section-block">
+          <h2 class="detail-section-heading">
+            <span>會員評論</span>
+            <button type="button" class="official-link" style="background:none;border:none;cursor:pointer;" onclick="goToReviewForStore(currentStoreId)">+ 撰寫這家店的評論</button>
+          </h2>
+          <div id="detailEmptyReviewBanner" class="empty-notice-banner">
+            這家店還沒有會員評論。
+          </div>
+          <div id="detailReviewsList"></div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- 視圖 3：收藏店家 (Favorites View)                           -->
+      <!-- ========================================================= -->
+      <section id="view-favorites" class="hidden">
+        <header class="page-header">
+          <p class="page-subtitle-top">我的美食日常</p>
+          <h1 class="page-title">收藏店家</h1>
+          <p class="page-desc">把想吃的、喜歡的店家收進口袋，下次就不必再找。</p>
+        </header>
+
+        <div class="card search-box-card">
+          <label for="favSearchInput" class="form-label">搜尋店名</label>
+          <input
+            id="favSearchInput"
+            type="text"
+            class="text-input"
+            placeholder="今天想找哪間店？"
+            oninput="renderFavoritesView()"
+            style="margin-bottom:14px;"
+          />
+          <div style="margin-bottom:14px;">
+            <label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;user-select:none;">
+              <input
+                id="onlyFavCheckbox"
+                type="checkbox"
+                onchange="renderFavoritesView()"
+                style="width:16px;height:16px;accent-color:var(--btn-orange);cursor:pointer;"
+              />
+              <span>只看我的收藏</span>
+            </label>
+          </div>
+          <button type="button" class="btn-primary" onclick="renderFavoritesView()">搜尋</button>
+        </div>
+
+        <p id="favCountText" class="count-text" style="margin:0 0 16px;">共 4 間店家</p>
+
+        <div id="favoritesGrid" class="grid-4"></div>
+
+        <div id="favEmptyState" class="card hidden" style="padding:36px;text-align:center;">
+          <p id="favEmptyTitle" style="font-weight:700;margin:0 0 8px;">目前尚未收藏任何店家</p>
+          <p id="favEmptyDesc" style="font-size:13px;color:var(--text-secondary);margin:0 0 16px;">取消勾選「只看我的收藏」即可瀏覽全部店家並加入收藏！</p>
+          <button type="button" class="btn-secondary" onclick="resetFavoritesFilters()">顯示全部店家</button>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- 視圖 4：分享評論 (Share Review View)                        -->
+      <!-- ========================================================= -->
+      <section id="view-reviews" class="hidden">
+        <header class="page-header">
+          <p class="page-subtitle-top">我的美食日常</p>
+          <h1 class="page-title">分享評論</h1>
+          <p class="page-desc">給喜歡的店家一點鼓勵，與大家分享你的用餐心得。</p>
+        </header>
+
+        <div class="card form-card">
+          <h2 class="detail-section-heading" style="margin-bottom:20px;">寫下這一餐</h2>
+          <form id="reviewForm" onsubmit="submitReviewForm(event)">
+            <div class="form-group">
+              <label for="reviewStoreSelect" class="form-label">選擇店家</label>
+              <select id="reviewStoreSelect" class="select-input">
+                <option value="">請選擇餐廳</option>
+              </select>
+            </div>
+
+            <fieldset class="rating-fieldset">
+              <legend>這次用餐評分</legend>
+              <div class="radio-group">
+                <label class="radio-label"><input type="radio" name="reviewStars" value="1" /> 1 星</label>
+                <label class="radio-label"><input type="radio" name="reviewStars" value="2" /> 2 星</label>
+                <label class="radio-label"><input type="radio" name="reviewStars" value="3" /> 3 星</label>
+                <label class="radio-label"><input type="radio" name="reviewStars" value="4" /> 4 星</label>
+                <label class="radio-label"><input type="radio" name="reviewStars" value="5" /> 5 星</label>
+              </div>
+            </fieldset>
+
+            <div class="form-group">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <label for="reviewTextInput" class="form-label" style="margin:0;">心得（選填，最多 500 字）</label>
+                <span id="reviewCharCounter" style="font-size:12px;color:var(--text-secondary);">0 / 500</span>
+              </div>
+              <textarea
+                id="reviewTextInput"
+                class="textarea-input"
+                rows="4"
+                maxlength="500"
+                placeholder="分享這道料理的口味、服務或環境感受..."
+                oninput="document.getElementById('reviewCharCounter').textContent = this.value.length + ' / 500'"
+              ></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary">送出評論</button>
+          </form>
+        </div>
+
+        <div class="section-block">
+          <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:16px;">
+            <h2 class="detail-section-heading" style="margin:0;">大家的最新評論</h2>
+            <span style="font-size:12.5px;color:var(--text-secondary);">最新 30 則</span>
+          </div>
+          <div id="publicReviewsGrid" class="grid-4"></div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- 視圖 5：美食轉盤 (Food Wheel View)                        -->
+      <!-- ========================================================= -->
+      <section id="view-wheel" class="hidden">
+        <header class="page-header">
+          <p class="page-subtitle-top" style="color:#8C735B;">我的美食日常</p>
+          <h1 class="page-title" style="color:#6B4C35;">美食轉盤</h1>
+          <p class="page-desc" style="color:#8C735B;">按下開始，從全部可抽選的店家中隨機挑一家。</p>
+        </header>
+
+        <!-- 上方轉盤互動卡片 -->
+        <div class="wheel-main-card">
+          <!-- 左側轉盤區 -->
+          <div class="wheel-left-col">
+            <div class="wheel-stage">
+              <div class="wheel-pointer" aria-hidden="true"></div>
+              <div class="wheel-outer-ring">
+                <svg id="wheelSvgRotor" class="wheel-svg-rotor" viewBox="0 0 240 240" aria-label="美食轉盤"></svg>
+              </div>
+              <div class="wheel-center-badge">吃什麼？</div>
+            </div>
+            <button id="wheelSpinBtn" type="button" class="wheel-spin-btn" onclick="spinFoodWheel()">
+              開始轉盤！
+            </button>
+          </div>
+
+          <!-- 右側抽選結果面板 -->
+          <div class="wheel-result-panel" id="wheelResultPanel">
+            <h2 class="wheel-result-heading">抽選結果</h2>
+            <p id="wheelResultInitialText" class="wheel-result-desc">
+              從 4 間店家抽選，點「開始轉盤！」查看結果。
+            </p>
+            <div id="wheelWinnerBox" class="hidden">
+              <p id="wheelWinnerName" class="wheel-winner-name"></p>
+              <p id="wheelWinnerMeta" class="wheel-winner-meta"></p>
+              <div style="display:flex;flex-wrap:wrap;gap:10px;">
+                <button id="wheelWinnerDetailBtn" type="button" class="wheel-nav-btn" style="font-size:14px;padding:9px 18px;">
+                  查看店家與導航
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 下方全部可抽選店家區塊 -->
+        <div class="section-block">
+          <h2 id="wheelAllStoresTitle" class="detail-section-heading" style="color:#6B4C35;margin-bottom:18px;">
+            全部可抽選店家（4 間）
+          </h2>
+          <div id="wheelStoresGrid" class="wheel-stores-grid"></div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- 視圖 6：新增餐廳 (AI 智慧建檔 View)                         -->
+      <!-- ========================================================= -->
+      <section id="view-add-restaurant" class="hidden">
+        <header class="page-header">
+          <p class="page-subtitle-top">我的美食日常</p>
+          <h1 class="page-title">新增餐廳</h1>
+          <p class="page-desc">輸入餐廳名稱與官方網頁，AI 將自動彙整店家資訊與招牌餐點至全站資料庫。</p>
+        </header>
+
+        <!-- 主要輸入表單卡片 -->
+        <div class="ai-form-card">
+          <div class="detail-section-heading" style="margin-bottom:18px;">
+            <span>AI 智慧建檔</span>
+            <span class="ai-badge">✨ 自動解析網頁與菜單熱量</span>
+          </div>
+
+          <form id="aiAddRestaurantForm" onsubmit="handleAiAddRestaurant(event)">
+            <div class="form-group">
+              <label for="aiStoreNameInput" class="form-label">餐廳名稱 <span style="color:#C15B1B;">*</span></label>
+              <input
+                id="aiStoreNameInput"
+                type="text"
+                class="text-input"
+                placeholder="例如：鼎泰豐 信義店 或 藏壽司 桃園店"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="aiStoreUrlInput" class="form-label">餐廳官方網頁或社群網址 <span style="color:#C15B1B;">*</span></label>
+              <input
+                id="aiStoreUrlInput"
+                type="url"
+                class="text-input"
+                placeholder="例如：https://..."
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <label for="aiStoreNotesInput" class="form-label" style="margin:0;">補充菜單或貼上網頁簡介（選填，可讓 AI 整理更精準）</label>
+                <span style="font-size:12px;color:var(--text-secondary);">支援貼上地址、營業時間或推薦菜色</span>
+              </div>
+              <textarea
+                id="aiStoreNotesInput"
+                class="textarea-input"
+                rows="3"
+                placeholder="可貼上官網介紹文字、推薦招牌菜、價位或營業時間，AI 將優先採納並結構化整理..."
+              ></textarea>
+            </div>
+
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
+              <button id="aiGenerateBtn" type="submit" class="btn-primary" style="padding:11px 22px;font-weight:700;">
+                ✨ AI 自動整理並加入餐廳
+              </button>
+              <button type="button" class="btn-secondary" onclick="fillDemoRestaurantInput()">
+                填入測試範例
+              </button>
+            </div>
+
+            <!-- AI 載入動畫與進度提示 -->
+            <div id="aiLoadingBox" class="ai-loading-box hidden" role="status">
+              <div class="ai-spinner"></div>
+              <div>
+                <div id="aiLoadingTitle" style="font-weight:700;margin-bottom:2px;">AI 正在解析網頁與餐廳特色...</div>
+                <div id="aiLoadingSub" style="font-size:12.5px;color:var(--text-secondary);">正在萃取地址、營業時間、參考消費區間與 6 道招牌餐點熱量</div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- 建檔成功預覽與操作卡片 -->
+        <div id="aiPreviewCard" class="ai-preview-card hidden">
+          <div class="detail-section-heading" style="margin-bottom:16px;">
+            <span>🎉 最新 AI 建檔成果預覽</span>
+            <span class="ai-badge" style="background-color:#FCE6D4;color:#C15B1B;">已同步至全站資料庫</span>
+          </div>
+
+          <div class="ai-preview-grid">
+            <div class="ai-preview-img">
+              <img
+                id="aiPreviewImg"
+                src=""
+                alt="新建檔餐廳封面"
+                onerror="this.onerror=null;this.src='https://placehold.co/640x400/F5E6CC/5A3825?text=%E6%96%B0%E5%A2%9E%E9%A4%90%E5%BB%B3';"
+              />
+            </div>
+
+            <div>
+              <h3 id="aiPreviewName" class="store-title" style="font-size:21px;margin-bottom:8px;"></h3>
+              <div class="store-meta" style="margin-bottom:10px;">
+                <p id="aiPreviewAddress"></p>
+                <p id="aiPreviewMetaLine"></p>
+                <p id="aiPreviewHours"></p>
+              </div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary);">AI 整理招牌餐點（6 道）：</div>
+              <div id="aiPreviewDishPills" class="ai-dish-pills"></div>
+
+              <div class="detail-actions" style="margin-top:18px;">
+                <button id="aiPreviewDetailBtn" type="button" class="btn-primary">
+                  前往查看此餐廳詳情 →
+                </button>
+                <button type="button" class="btn-secondary" onclick="switchView('list')">
+                  在餐廳與餐點頁面檢視
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 已建檔餐廳管理列表區塊 -->
+        <div class="section-block">
+          <div class="detail-section-heading" style="margin-bottom:16px;">
+            <span>已建檔餐廳管理列表</span>
+            <span id="manageStoresCount" style="font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:400;color:var(--text-secondary);">目前共 4 間餐廳</span>
+          </div>
+          <div id="manageStoresList"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- 提示訊息 Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite">
+    <span class="toast-dot"></span>
+    <span id="toastText"></span>
+  </div>
+
+  <script>
+    // =========================================================
+    // 1. 完整 4 家餐廳資料庫 (restaurantsData)
+    // =========================================================
+    const restaurantsData = [
+      {
+        id: 'donpo',
+        name: '東坡醉月餐館',
+        address: '807 高雄市三民區明誠一路491號',
+        priceRange: '619.00–738.00 元',
+        walkTime: '步行 12 分鐘',
+        hours: '平日 11:00-15:00、17:30-22:00；假日 11:00-15:30、17:00-22:00',
+        prepSpeed: '單點現做吃到飽 (用餐限2小時)',
+        signatureDish: '醉月東坡肉、檸檬蒸鮮魚、鳳梨蝦球、花雕雞',
+        website: 'https://donpoz51.framer.website/',
+        phone: '07-397-9397',
+        mapQuery: '807高雄市三民區明誠一路491號',
+        coverImage: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
+        dishes: [
+          { id: 'donpo-1', name: '醉月東坡肉', calories: '480.00–650.00 kcal', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80' },
+          { id: 'donpo-2', name: '檸檬蒸鮮魚', calories: '260.00–380.00 kcal', image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80' },
+          { id: 'donpo-3', name: '鳳梨蝦球', calories: '350.00–490.00 kcal', image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80' },
+          { id: 'donpo-4', name: '花雕雞', calories: '420.00–580.00 kcal', image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=600&q=80' },
+          { id: 'donpo-5', name: '牛筋牛肉搶鍋麵', calories: '520.00–680.00 kcal', image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80' },
+          { id: 'donpo-6', name: '蝦仁蛋炒飯', calories: '450.00–610.00 kcal', image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=600&q=80' }
+        ]
+      },
+      {
+        id: 'shuiyue',
+        name: '水月囍樓',
+        address: '900 屏東縣屏東市和生路二段574號',
+        priceRange: '450.00–1200.00 元',
+        walkTime: '步行 15 分鐘',
+        hours: '禮拜一到日 11:30-14:30、17:30-21:30',
+        prepSpeed: '現點現蒸 / 星級宴席主廚現做 (三星級溯源餐廳)',
+        signatureDish: '極品櫻桃鴨、經典港式飲茶、海味蒸氣鍋、屏東招牌豬腳湯',
+        website: 'https://shuiyue.com.tw',
+        phone: '08-755-1875',
+        mapQuery: '900屏東縣屏東市和生路二段574號',
+        coverImage: 'https://images.unsplash.com/photo-1518492104633-130d0cc84637?auto=format&fit=crop&w=800&q=80',
+        dishes: [
+          { id: 'shuiyue-1', name: '極品櫻桃鴨', calories: '520.00–740.00 kcal', image: 'https://images.unsplash.com/photo-1518492104633-130d0cc84637?auto=format&fit=crop&w=600&q=80' },
+          { id: 'shuiyue-2', name: '經典港式飲茶', calories: '280.00–450.00 kcal', image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80' },
+          { id: 'shuiyue-3', name: '海味蒸氣鍋', calories: '310.00–480.00 kcal', image: 'https://images.unsplash.com/photo-1559737558-2f5a35f4523b?auto=format&fit=crop&w=600&q=80' },
+          { id: 'shuiyue-4', name: '屏東招牌豬腳湯', calories: '460.00–640.00 kcal', image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=600&q=80' },
+          { id: 'shuiyue-5', name: '旬彩日本料理', calories: '320.00–490.00 kcal', image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=600&q=80' },
+          { id: 'shuiyue-6', name: '養生素食套餐', calories: '350.00–480.00 kcal', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80' }
+        ]
+      },
+      {
+        id: 'saboten',
+        name: '勝博殿 屏東環球店',
+        address: '900 屏東縣屏東市仁愛路90號5樓 (環球購物中心屏東店)',
+        priceRange: '430.00–560.00 元',
+        walkTime: '步行 8 分鐘',
+        hours: '禮拜一到日 11:00-22:00',
+        prepSpeed: '現點現炸職人定食 (約 12–15 分鐘)',
+        signatureDish: '日本廣島牡蠣套餐、特上厚切老饕里脊豬排、旬鮮鹽味雞湯豬肉鍋',
+        website: 'https://www.saboten.com.tw',
+        phone: '08-732-1198',
+        mapQuery: '900屏東縣屏東市仁愛路90號',
+        coverImage: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=800&q=80',
+        dishes: [
+          { id: 'saboten-1', name: '日本廣島牡蠣套餐A ($560)', calories: '780.00–960.00 kcal', image: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=600&q=80' },
+          { id: 'saboten-2', name: '特上厚切老饕里脊豬排 ($500)', calories: '820.00–1020.00 kcal', image: 'https://images.unsplash.com/photo-1585325701165-351af916e581?auto=format&fit=crop&w=600&q=80' },
+          { id: 'saboten-3', name: '旬鮮～鹽味雞湯豬肉鍋 ($430)', calories: '610.00–790.00 kcal', image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=600&q=80' },
+          { id: 'saboten-4', name: '腰內豬排定食', calories: '690.00–850.00 kcal', image: 'https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?auto=format&fit=crop&w=600&q=80' },
+          { id: 'saboten-5', name: '脆嫩雞排定食', calories: '720.00–880.00 kcal', image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600&q=80' },
+          { id: 'saboten-6', name: '元祖香脆豬排捲定食', calories: '750.00–920.00 kcal', image: 'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80' }
+        ]
+      },
+      {
+        id: 'yipin',
+        name: 'Yipin Pasta 義品 龜山A7文青萬家康超市店',
+        address: '333 桃園市龜山區文青路137號',
+        priceRange: '160.00–320.00 元',
+        walkTime: '步行 7 分鐘',
+        hours: '禮拜一到日 11:00-14:30、17:00-20:30',
+        prepSpeed: '現點現炒義式料理 (約 10–12 分鐘)',
+        signatureDish: '台味剝皮辣椒雞肉義大利麵、經典奶油培根義大利麵、青醬嫩雞燉飯',
+        website: 'https://yipinpasta.com.tw',
+        phone: '03-328-6137',
+        mapQuery: '333桃園市龜山區文青路137號',
+        coverImage: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?auto=format&fit=crop&w=800&q=80',
+        dishes: [
+          { id: 'yipin-1', name: '剝皮辣椒雞肉義大利麵', calories: '580.00–720.00 kcal', image: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?auto=format&fit=crop&w=600&q=80' },
+          { id: 'yipin-2', name: '奶油培根蛋黃義大利麵', calories: '640.00–790.00 kcal', image: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&w=600&q=80' },
+          { id: 'yipin-3', name: '羅勒青醬嫩雞燉飯', calories: '610.00–760.00 kcal', image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?auto=format&fit=crop&w=600&q=80' },
+          { id: 'yipin-4', name: '番茄海鮮總匯義大利麵', calories: '540.00–690.00 kcal', image: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&w=600&q=80' },
+          { id: 'yipin-5', name: '蒜香白酒蛤蜊義大利麵', calories: '490.00–630.00 kcal', image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=600&q=80' },
+          { id: 'yipin-6', name: '義式招牌炸物雙拼', calories: '420.00–560.00 kcal', image: 'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80' }
+        ]
+      }
+    ];
+
+    // =========================================================
+    // 2. 全域狀態管理
+    // =========================================================
+    let currentStoreId = 'donpo';
+    const favoriteIds = new Set();
+    const recordedDishes = new Set();
+    const quickRatings = {}; // 當餐廳尚無文字評論時的手動快速星等紀錄
+
+    let reviewsList = [
+      {
+        storeId: 'yipin',
+        storeName: 'Yipin Pasta 義品 龜山A7文青萬家康超市店',
+        stars: 5,
+        text: '剝皮辣椒雞肉義大利麵微辣開胃超涮嘴！麵條Q彈吸飽醬汁，就在A7文青路超市旁超方便。',
+        author: '庫洛米',
+        timestamp: '2026-11-20 11:10:25'
+      },
+      {
+        storeId: 'saboten',
+        storeName: '勝博殿 屏東環球店',
+        stars: 5,
+        text: '特上厚切老饕里脊豬排外酥內嫩超多汁，現磨芝麻豬排醬配無限續加的高麗菜絲非常解膩！',
+        author: '庫洛米',
+        timestamp: '2026-11-18 18:45:12'
+      },
+      {
+        storeId: 'shuiyue',
+        storeName: '水月囍樓',
+        stars: 5,
+        text: '極品櫻桃鴨片鴨皮脆肉嫩，港式流沙包還會爆漿，三星級溯源餐廳帶家人聚餐很放心。',
+        author: '庫洛米',
+        timestamp: '2026-11-16 13:20:38'
+      },
+      {
+        storeId: 'donpo',
+        storeName: '東坡醉月餐館',
+        stars: 5,
+        text: '醉月東坡肉肥而不膩超下飯，單點現炒吃到飽很有誠意，檸檬蒸鮮魚也很新鮮！',
+        author: '庫洛米',
+        timestamp: '2026-11-14 19:52:04'
+      }
+    ];
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function getStore(id) {
+      return restaurantsData.find(s => s.id === id) || restaurantsData[0];
+    }
+
+    // =========================================================
+    // 3. 視圖切換與側邊欄控制
+    // =========================================================
+    function toggleSidebar(open) {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      if (open) {
+        sidebar.classList.add('open');
+        overlay.classList.add('open');
+      } else {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+      }
+    }
+
+    function switchView(viewName) {
+      ['list', 'detail', 'favorites', 'reviews', 'wheel', 'add-restaurant'].forEach(v => {
+        document.getElementById('view-' + v).classList.add('hidden');
+      });
+      document.getElementById('view-' + viewName).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      if (viewName === 'list' || viewName === 'detail') {
+        document.getElementById('nav-list').classList.add('active');
+      } else if (viewName === 'favorites') {
+        document.getElementById('nav-favorites').classList.add('active');
+        renderFavoritesView();
+      } else if (viewName === 'reviews') {
+        document.getElementById('nav-reviews').classList.add('active');
+        renderPublicReviews();
+      } else if (viewName === 'wheel') {
+        document.getElementById('nav-wheel').classList.add('active');
+        renderWheelView();
+      } else if (viewName === 'add-restaurant') {
+        document.getElementById('nav-add-restaurant').classList.add('active');
+        renderManageStoresList();
+      }
+
+      toggleSidebar(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // =========================================================
+    // 4. 視圖 1：餐廳與餐點 (List View)
+    // =========================================================
+    function renderListView() {
+      const keyword = (document.getElementById('listSearchInput').value || '').trim().toLowerCase();
+      const grid = document.getElementById('listGrid');
+      const countText = document.getElementById('listCountText');
+      const emptyState = document.getElementById('listEmptyState');
+
+      const filtered = restaurantsData.filter(store => {
+        if (!keyword) return true;
+        const dishNames = store.dishes.map(d => d.name).join(' ').toLowerCase();
+        return (
+          store.name.toLowerCase().includes(keyword) ||
+          store.address.toLowerCase().includes(keyword) ||
+          store.signatureDish.toLowerCase().includes(keyword) ||
+          dishNames.includes(keyword)
+        );
+      });
+
+      countText.textContent = `共 ${filtered.length} 間餐廳`;
+      emptyState.classList.toggle('hidden', filtered.length > 0);
+
+      grid.innerHTML = filtered.map(store => `
+        <article class="card card-hover store-card">
+          <div>
+            <div class="store-img-wrap">
+              <img
+                src="${store.coverImage}"
+                alt="${escapeHtml(store.name)}"
+                onerror="this.onerror=null;this.src='https://placehold.co/640x400/F5E6CC/5A3825?text=${encodeURIComponent(store.name)}';"
+              />
+            </div>
+            <h2 class="store-title">${escapeHtml(store.name)}</h2>
+            <div class="store-meta">
+              <p>${escapeHtml(store.address)}</p>
+              <p>參考消費：${escapeHtml(store.priceRange)} ｜ ${escapeHtml(store.walkTime)}</p>
+              <p>${escapeHtml(store.hours)}</p>
+            </div>
+          </div>
+          <div>
+            <button type="button" class="btn-primary" onclick="openStoreDetail('${store.id}')">
+              查看餐廳
+            </button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    // =========================================================
+    // 5. 視圖 2：餐廳詳情頁 (Detail View)
+    // =========================================================
+    function openStoreDetail(storeId, scrollToDishes = false) {
+      currentStoreId = storeId;
+      const store = getStore(storeId);
+
+      document.getElementById('detailTitle').textContent = store.name;
+      const heroImg = document.getElementById('detailImage');
+      heroImg.src = store.coverImage;
+      heroImg.alt = store.name;
+
+      document.getElementById('detailWebsiteLink').href = store.website;
+      document.getElementById('detailAddress').textContent = store.address;
+      document.getElementById('detailPhone').textContent = store.phone;
+      document.getElementById('detailPrice').textContent = store.priceRange;
+      document.getElementById('detailWalk').textContent = store.walkTime;
+      document.getElementById('detailHours').textContent = store.hours;
+      document.getElementById('detailPrep').textContent = store.prepSpeed;
+      document.getElementById('detailSignature').textContent = store.signatureDish;
+
+      const encodedMap = encodeURIComponent(store.mapQuery);
+      document.getElementById('detailMapBtn').href = `https://www.google.com/maps/search/?api=1&query=${encodedMap}`;
+      document.getElementById('detailMapIframe').src = `https://www.google.com/maps?q=${encodedMap}&output=embed`;
+
+      renderDetailDishes(store);
+      updateDetailFavButton();
+      updateDetailRatingAndReviews();
+
+      switchView('detail');
+
+      if (scrollToDishes) {
+        setTimeout(() => {
+          document.getElementById('detail-dishes-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 80);
+      }
+    }
+
+    function renderDetailDishes(store) {
+      document.getElementById('detailDishesCount').textContent = `共 ${store.dishes.length} 道餐點`;
+      const grid = document.getElementById('detailDishesGrid');
+
+      grid.innerHTML = store.dishes.map(dish => {
+        const isRecorded = recordedDishes.has(dish.id);
+        return `
+          <article class="card card-hover dish-card">
+            <div>
+              <div class="dish-img-wrap">
+                <img
+                  src="${dish.image}"
+                  alt="${escapeHtml(dish.name)}"
+                  onerror="this.onerror=null;this.src='https://placehold.co/600x400/F5E6CC/5A3825?text=${encodeURIComponent(dish.name)}';"
+                />
+              </div>
+              <h3 class="dish-title">${escapeHtml(dish.name)}</h3>
+            </div>
+            <div>
+              <p class="dish-cal">參考熱量 ${escapeHtml(dish.calories)}</p>
+              <button
+                type="button"
+                class="record-btn ${isRecorded ? 'recorded' : ''}"
+                onclick="toggleRecordDish('${dish.id}', '${escapeHtml(dish.name)}')"
+              >
+                ${isRecorded ? '✓ 已記錄這道餐點' : '記錄這道餐點'}
+              </button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function toggleRecordDish(dishId, dishName) {
+      if (recordedDishes.has(dishId)) {
+        recordedDishes.delete(dishId);
+        showToast(`已取消記錄「${dishName}」`);
+      } else {
+        recordedDishes.add(dishId);
+        showToast(`已將「${dishName}」加入您的用餐日誌！`);
+      }
+      renderDetailDishes(getStore(currentStoreId));
+    }
+
+    function rateStore(stars) {
+      const store = getStore(currentStoreId);
+      quickRatings[currentStoreId] = stars;
+      updateDetailRatingAndReviews();
+      showToast(`已為「${store.name}」評為 ${stars} 顆星！`);
+    }
+
+    function updateDetailRatingAndReviews() {
+      const store = getStore(currentStoreId);
+      const storeReviews = reviewsList.filter(r => r.storeId === store.id || r.storeName === store.name);
+      const starBtns = document.querySelectorAll('#detailStarButtons .star-btn');
+      const ratingLabel = document.getElementById('detailRatingLabel');
+      const emptyBanner = document.getElementById('detailEmptyReviewBanner');
+      const listContainer = document.getElementById('detailReviewsList');
+
+      let activeStars = 0;
+      if (storeReviews.length > 0) {
+        const avg = storeReviews.reduce((acc, r) => acc + r.stars, 0) / storeReviews.length;
+        activeStars = Math.round(avg);
+        ratingLabel.textContent = `${avg.toFixed(1)} (${storeReviews.length} 則評分)`;
+      } else if (quickRatings[currentStoreId]) {
+        activeStars = quickRatings[currentStoreId];
+        ratingLabel.textContent = `${activeStars}.0 (1 則評分)`;
+      } else {
+        ratingLabel.textContent = '尚無評分';
+      }
+
+      starBtns.forEach(btn => {
+        const val = Number(btn.dataset.star);
+        if (val <= activeStars) {
+          btn.textContent = '★';
+          btn.classList.add('filled');
+        } else {
+          btn.textContent = '☆';
+          btn.classList.remove('filled');
+        }
+      });
+
+      if (storeReviews.length === 0) {
+        emptyBanner.classList.remove('hidden');
+        listContainer.innerHTML = '';
+      } else {
+        emptyBanner.classList.add('hidden');
+        listContainer.innerHTML = storeReviews.map(r => `
+          <div class="card detail-review-item">
+            <div class="detail-review-top">
+              <div class="author-badge">
+                <span class="author-avatar">${escapeHtml(r.author.charAt(0))}</span>
+                <span>${escapeHtml(r.author)}</span>
+                <span class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</span>
+              </div>
+              <span style="font-size:12px;color:var(--text-secondary);">${escapeHtml(r.timestamp)}</span>
+            </div>
+            <p style="margin:0;font-size:14px;color:var(--text-secondary);line-height:1.6;">${escapeHtml(r.text)}</p>
+          </div>
+        `).join('');
+      }
+    }
+
+    // =========================================================
+    // 6. 收藏店家同步機制 & 視圖 3 (Favorites View)
+    // =========================================================
+    function toggleFavorite(storeId) {
+      const store = getStore(storeId);
+      if (favoriteIds.has(storeId)) {
+        favoriteIds.delete(storeId);
+        showToast(`已將「${store.name}」從收藏移除`);
+      } else {
+        favoriteIds.add(storeId);
+        showToast(`已收藏「${store.name}」！`);
+      }
+      updateDetailFavButton();
+      renderFavoritesView();
+    }
+
+    function updateDetailFavButton() {
+      const btn = document.getElementById('detailFavBtn');
+      if (!btn) return;
+      if (favoriteIds.has(currentStoreId)) {
+        btn.innerHTML = '♥ 已收藏';
+        btn.style.fontWeight = '700';
+      } else {
+        btn.innerHTML = '收藏店家';
+        btn.style.fontWeight = '500';
+      }
+    }
+
+    function renderFavoritesView() {
+      const keyword = (document.getElementById('favSearchInput').value || '').trim().toLowerCase();
+      const onlyFav = document.getElementById('onlyFavCheckbox').checked;
+      const grid = document.getElementById('favoritesGrid');
+      const countText = document.getElementById('favCountText');
+      const emptyState = document.getElementById('favEmptyState');
+
+      const filtered = restaurantsData.filter(store => {
+        const matchKey = !keyword ||
+          store.name.toLowerCase().includes(keyword) ||
+          store.address.toLowerCase().includes(keyword) ||
+          store.signatureDish.toLowerCase().includes(keyword);
+        const matchFav = !onlyFav || favoriteIds.has(store.id);
+        return matchKey && matchFav;
+      });
+
+      countText.textContent = `共 ${filtered.length} 間店家`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        document.getElementById('favEmptyTitle').textContent = onlyFav && favoriteIds.size === 0
+          ? '目前尚未收藏任何店家'
+          : '找不到符合條件的店家';
+        document.getElementById('favEmptyDesc').textContent = onlyFav && favoriteIds.size === 0
+          ? '取消勾選「只看我的收藏」即可瀏覽全部 4 間店家並加入收藏！'
+          : '請嘗試搜尋其他關鍵字或重設篩選條件。';
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      grid.innerHTML = filtered.map(store => {
+        const isFav = favoriteIds.has(store.id);
+        const btnHtml = isFav
+          ? `<button type="button" class="btn-secondary btn-full" style="font-weight:700;" onclick="toggleFavorite('${store.id}')">♥ 已收藏 · 取消收藏</button>`
+          : `<button type="button" class="btn-primary btn-full" onclick="toggleFavorite('${store.id}')">♡ 收藏店家</button>`;
+
+        return `
+          <article class="card card-hover store-card">
+            <div>
+              <div class="store-img-wrap">
+                <img
+                  src="${store.coverImage}"
+                  alt="${escapeHtml(store.name)}"
+                  onerror="this.onerror=null;this.src='https://placehold.co/640x400/F5E6CC/5A3825?text=${encodeURIComponent(store.name)}';"
+                />
+              </div>
+              <h2 class="store-title">${escapeHtml(store.name)}</h2>
+              <div class="store-meta">
+                <p>${escapeHtml(store.address)}</p>
+                <p>${escapeHtml(store.hours)}</p>
+              </div>
+            </div>
+            <div>
+              ${btnHtml}
+              <button type="button" class="view-dishes-link" onclick="openStoreDetail('${store.id}', true)">
+                查看餐點 →
+              </button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function resetFavoritesFilters() {
+      document.getElementById('favSearchInput').value = '';
+      document.getElementById('onlyFavCheckbox').checked = false;
+      renderFavoritesView();
+    }
+
+    // =========================================================
+    // 7. 視圖 4：分享評論 (Share Review View)
+    // =========================================================
+    function populateStoreSelect() {
+      const select = document.getElementById('reviewStoreSelect');
+      const options = ['<option value="">請選擇餐廳</option>'].concat(
+        restaurantsData.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`)
+      );
+      select.innerHTML = options.join('');
+    }
+
+    function goToReviewForStore(storeId) {
+      switchView('reviews');
+      document.getElementById('reviewStoreSelect').value = storeId;
+    }
+
+    function submitReviewForm(event) {
+      event.preventDefault();
+      const storeId = document.getElementById('reviewStoreSelect').value;
+      const checkedRadio = document.querySelector('input[name="reviewStars"]:checked');
+      const rawText = document.getElementById('reviewTextInput').value.trim();
+
+      if (!storeId) {
+        showToast('請先選擇要評論的店家！');
+        document.getElementById('reviewStoreSelect').focus();
+        return;
+      }
+      if (!checkedRadio) {
+        showToast('請點選這次用餐的星等評分！');
+        return;
+      }
+
+      const store = getStore(storeId);
+      const stars = Number(checkedRadio.value);
+      const now = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      const timestamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+      reviewsList.unshift({
+        storeId: store.id,
+        storeName: store.name,
+        stars,
+        text: rawText || '美味餐點，值得再訪！',
+        author: '庫洛米',
+        timestamp
+      });
+
+      if (reviewsList.length > 30) {
+        reviewsList = reviewsList.slice(0, 30);
+      }
+
+      document.getElementById('reviewForm').reset();
+      document.getElementById('reviewCharCounter').textContent = '0 / 500';
+
+      renderPublicReviews();
+      if (currentStoreId === store.id) {
+        updateDetailRatingAndReviews();
+      }
+      showToast(`已成功發佈對「${store.name}」的 ${stars} 星評論！`);
+    }
+
+    function renderPublicReviews() {
+      const grid = document.getElementById('publicReviewsGrid');
+      grid.innerHTML = reviewsList.map(r => `
+        <article class="card card-hover review-card">
+          <div>
+            <h3 class="review-store-name">${escapeHtml(r.storeName)}</h3>
+            <div class="review-stars-row">
+              <span class="review-stars">${'★'.repeat(r.stars)}</span>
+              <span class="review-score">${r.stars}/5</span>
+            </div>
+            <p class="review-body">${escapeHtml(r.text)}</p>
+          </div>
+          <div class="review-footer">
+            ${escapeHtml(r.author)} · ${escapeHtml(r.timestamp)}
+          </div>
+        </article>
+      `).join('');
+    }
+
+    // =========================================================
+    // 8. Toast 提示與初始化
+    // =========================================================
+    // 8. 視圖 5：美食轉盤 (Food Wheel View - 動態 N 家店擴充)
+    // =========================================================
+    let wheelCurrentRotation = 0;
+    let isWheelSpinning = false;
+    let lastWonStoreId = null;
+
+    function getShortWheelLabel(name, totalCount) {
+      const cleanName = name.split(' ')[0];
+      const maxLen = totalCount <= 4 ? 6 : (totalCount <= 8 ? 5 : 4);
+      return cleanName.length > maxLen ? cleanName.slice(0, maxLen) : cleanName;
+    }
+
+    function renderWheelView() {
+      const total = restaurantsData.length;
+      document.getElementById('wheelAllStoresTitle').textContent = `全部可抽選店家（${total} 間）`;
+
+      if (!lastWonStoreId) {
+        document.getElementById('wheelResultInitialText').textContent = `從 ${total} 間店家抽選，點「開始轉盤！」查看結果。`;
+      }
+
+      renderWheelSvg();
+      renderWheelStoresGrid();
+    }
+
+    function renderWheelSvg() {
+      const svg = document.getElementById('wheelSvgRotor');
+      const count = restaurantsData.length;
+      if (!svg || count === 0) return;
+
+      const palette = ['#F4E3C3', '#E4D5F2', '#F2D6B3', '#F6EAD2'];
+      const cx = 120;
+      const cy = 120;
+      const r = 120;
+      const sliceAngle = 360 / count;
+      const fontSize = count <= 4 ? 11.5 : (count <= 6 ? 10 : (count <= 10 ? 8.5 : 7.5));
+      const textRadius = count <= 4 ? 76 : 82;
+
+      // 確保相鄰扇區顏色不重複（特別當最後一格與第一格同色時自動錯開）
+      const sliceColors = restaurantsData.map((_, idx) => palette[idx % palette.length]);
+      if (count > 1 && sliceColors[count - 1] === sliceColors[0]) {
+        sliceColors[count - 1] = palette[1];
+      }
+
+      let svgContent = '';
+
+      restaurantsData.forEach((store, index) => {
+        // 0 度設定為 12 點鐘正上方（順時針計算）
+        const startDeg = index * sliceAngle;
+        const endDeg = (index + 1) * sliceAngle;
+        const midDeg = startDeg + sliceAngle / 2;
+
+        const startRad = (startDeg - 90) * Math.PI / 180;
+        const endRad = (endDeg - 90) * Math.PI / 180;
+
+        const x1 = cx + r * Math.cos(startRad);
+        const y1 = cy + r * Math.sin(startRad);
+        const x2 = cx + r * Math.cos(endRad);
+        const y2 = cy + r * Math.sin(endRad);
+
+        const largeArcFlag = sliceAngle > 180 ? 1 : 0;
+        const fill = sliceColors[index];
+
+        if (count === 1) {
+          svgContent += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" />`;
+        } else {
+          const pathData = `M ${cx} ${cy} L ${x1.toFixed(3)} ${y1.toFixed(3)} A ${r} ${r} 0 ${largeArcFlag} 1 ${x2.toFixed(3)} ${y2.toFixed(3)} Z`;
+          svgContent += `<path d="${pathData}" fill="${fill}" stroke="#DFC9AF" stroke-width="0.75" />`;
+        }
+
+        // 放射狀顯示簡短店名標籤
+        const midRad = (midDeg - 90) * Math.PI / 180;
+        const tx = cx + textRadius * Math.cos(midRad);
+        const ty = cy + textRadius * Math.sin(midRad);
+        const label = escapeHtml(getShortWheelLabel(store.name, count));
+
+        // 保持文字正向易讀
+        let textRotate = midDeg;
+        if (midDeg > 90 && midDeg < 270) {
+          textRotate += 180;
+        }
+
+        svgContent += `
+          <text
+            x="${tx.toFixed(2)}"
+            y="${ty.toFixed(2)}"
+            fill="#6B4C35"
+            font-size="${fontSize}"
+            font-weight="700"
+            font-family="'Noto Sans TC', sans-serif"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            transform="rotate(${textRotate.toFixed(2)}, ${tx.toFixed(2)}, ${ty.toFixed(2)})"
+          >${label}</text>
+        `;
+      });
+
+      svg.innerHTML = svgContent;
+    }
+
+    function renderWheelStoresGrid() {
+      const grid = document.getElementById('wheelStoresGrid');
+      if (!grid) return;
+
+      grid.innerHTML = restaurantsData.map(store => {
+        const isHighlighted = lastWonStoreId === store.id;
+        return `
+          <article id="wheel-card-${store.id}" class="wheel-store-card ${isHighlighted ? 'highlighted' : ''}">
+            <h3 class="wheel-store-card-title">${escapeHtml(store.name)}</h3>
+            <button type="button" class="wheel-nav-btn" onclick="openStoreDetail('${store.id}')">
+              查看店家與導航
+            </button>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function spinFoodWheel() {
+      const count = restaurantsData.length;
+      if (isWheelSpinning || count === 0) return;
+
+      isWheelSpinning = true;
+      const spinBtn = document.getElementById('wheelSpinBtn');
+      const rotor = document.getElementById('wheelSvgRotor');
+      spinBtn.disabled = true;
+      spinBtn.textContent = '轉動中...';
+
+      // 移除上一次卡片高亮狀態
+      lastWonStoreId = null;
+      document.querySelectorAll('.wheel-store-card.highlighted').forEach(el => el.classList.remove('highlighted'));
+
+      // 隨機選出目標餐廳索引 (0 ~ N-1)
+      const targetIndex = Math.floor(Math.random() * count);
+      const chosenStore = restaurantsData[targetIndex];
+      const sliceAngle = 360 / count;
+
+      // 扇區中心角度 + 扇區內 ±28% 微幅隨機偏移（避免每次停在正中心線）
+      const jitter = (Math.random() - 0.5) * (sliceAngle * 0.56);
+      const targetAngleInWheel = targetIndex * sliceAngle + sliceAngle / 2 + jitter;
+
+      // 計算需要停在 12 點鐘指針 (0 deg) 的目標餘數角度
+      const desiredMod = (360 - (targetAngleInWheel % 360) + 360) % 360;
+      const currentMod = ((wheelCurrentRotation % 360) + 360) % 360;
+      const deltaMod = (desiredMod - currentMod + 360) % 360;
+
+      // 加上 5 到 8 圈整數順時針旋轉
+      const fullTurns = 5 + Math.floor(Math.random() * 4);
+      wheelCurrentRotation += fullTurns * 360 + deltaMod;
+
+      rotor.style.transition = 'transform 4.2s cubic-bezier(0.15, 0.85, 0.2, 1)';
+      rotor.style.transform = `rotate(${wheelCurrentRotation}deg)`;
+
+      setTimeout(() => {
+        isWheelSpinning = false;
+        spinBtn.disabled = false;
+        spinBtn.textContent = '開始轉盤！';
+        lastWonStoreId = chosenStore.id;
+
+        // 更新右側「抽選結果」面板
+        document.getElementById('wheelResultInitialText').classList.add('hidden');
+        const winnerBox = document.getElementById('wheelWinnerBox');
+        winnerBox.classList.remove('hidden');
+
+        document.getElementById('wheelWinnerName').textContent = `🎉 ${chosenStore.name}`;
+        document.getElementById('wheelWinnerMeta').innerHTML = `
+          地址：${escapeHtml(chosenStore.address)}<br />
+          參考消費：${escapeHtml(chosenStore.priceRange)} ｜ 招牌：${escapeHtml(chosenStore.signatureDish)}
+        `;
+
+        const detailBtn = document.getElementById('wheelWinnerDetailBtn');
+        detailBtn.onclick = () => openStoreDetail(chosenStore.id);
+
+        // 下方對應店家卡片加上暖橘色外框高亮
+        const targetCard = document.getElementById(`wheel-card-${chosenStore.id}`);
+        if (targetCard) {
+          targetCard.classList.add('highlighted');
+        }
+
+        showToast(`轉盤抽選結果：「${chosenStore.name}」！`);
+      }, 4250);
+    }
+
+    // =========================================================
+    // 9. Toast 提示與初始化
+    // =========================================================
+    // 9. 視圖 6：新增餐廳 AI 智慧建檔與管理邏輯
+    // =========================================================
+    const BUILTIN_STORE_IDS = new Set(['donpo', 'shuiyue', 'saboten', 'yipin']);
+    let lastAddedStoreId = null;
+
+    function fillDemoRestaurantInput() {
+      document.getElementById('aiStoreNameInput').value = '鼎泰豐 信義店';
+      document.getElementById('aiStoreUrlInput').value = 'https://www.dintaifung.com.tw/';
+      document.getElementById('aiStoreNotesInput').value = '台北市大安區信義路二段194號，招牌黃金十八摺小籠包、蝦仁蛋炒飯、元盅雞湯、紅油抄手，消費約 450-850 元。';
+      showToast('已填入測試範例，可直接點擊「AI 自動整理並加入餐廳」');
+    }
+
+    // 依據料理類型匹配高質感 Unsplash 美食攝影圖
+    function getCategoryFoodImages(categoryHint) {
+      const text = (categoryHint || '').toLowerCase();
+      if (text.includes('火鍋') || text.includes('麻辣') || text.includes('涮涮鍋') || text.includes('鍋物')) {
+        return {
+          cover: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80',
+          dishes: [
+            'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1559737558-2f5a35f4523b?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80'
+          ]
+        };
+      }
+      if (text.includes('壽司') || text.includes('日料') || text.includes('日本') || text.includes('刺身') || text.includes('拉麵')) {
+        return {
+          cover: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80',
+          dishes: [
+            'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1585325701165-351af916e581?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80'
+          ]
+        };
+      }
+      if (text.includes('義式') || text.includes('義大利麵') || text.includes('披薩') || text.includes('牛排') || text.includes('早午餐') || text.includes('咖啡')) {
+        return {
+          cover: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?auto=format&fit=crop&w=800&q=80',
+          dishes: [
+            'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1476124369491-e7addf5db371?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=600&q=80'
+          ]
+        };
+      }
+      // 預設中式 / 港式 / 亞洲料理高質感圖組
+      return {
+        cover: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=800&q=80',
+        dishes: [
+          'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80',
+          'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=600&q=80',
+          'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=600&q=80',
+          'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80',
+          'https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80',
+          'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=600&q=80'
+        ]
+      };
+    }
+
+    // 呼叫 Gemini API (gemini-3-flash-preview + Google Search Grounding) 整理餐廳資料
+    async function fetchRestaurantInfoFromGemini(name, url, notes) {
+      const apiKey = "";
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+      const systemPrompt = `你是「我的美食日常」專業餐廳資料庫整理員。請根據使用者提供的餐廳名稱、官方網址與補充資訊，透過搜尋查詢該餐廳真實資訊，並嚴格只回傳純 JSON 物件（不要包含 Markdown \`\`\`json 標記或任何額外解釋文字）。
+JSON 欄位規範如下：
+{
+  "name": "完整餐廳名稱",
+  "address": "完整台灣地址（含郵遞區號或縣市區域）",
+  "phone": "訂位電話（若無則提供 02-2345-6789 格式或填寫 現場候位為主）",
+  "priceRange": "例如 350.00–680.00 元",
+  "walkTime": "例如 步行 8 分鐘",
+  "hours": "例如 禮拜一到日 11:00-21:30",
+  "speed": "出餐速度與用餐方式說明",
+  "signature": "3至4道招牌餐點名稱，以頓號分隔",
+  "category": "料理類型關鍵字（如：中式點心、火鍋、日式壽司、義式料理、燒肉、早午餐）",
+  "menu": [
+    { "name": "餐點1（可附參考價格）", "calories": "320.00–450.00 kcal" },
+    { "name": "餐點2", "calories": "480.00–620.00 kcal" },
+    { "name": "餐點3", "calories": "290.00–410.00 kcal" },
+    { "name": "餐點4", "calories": "510.00–680.00 kcal" },
+    { "name": "餐點5", "calories": "360.00–520.00 kcal" },
+    { "name": "餐點6", "calories": "250.00–390.00 kcal" }
+  ]
+}
+務必確保 menu 陣列剛好包含 6 道該餐廳最具代表性的招牌餐點。`;
+
+      const userQuery = `請查詢並整理以下餐廳的詳細資料與 6 道招牌餐點：
+- 餐廳名稱：${name}
+- 官方網頁或社群網址：${url}
+- 維護者補充說明：${notes || '無'}`;
+
+      const payload = {
+        contents: [{ parts: [{ text: userQuery }] }],
+        tools: [{ google_search: {} }],
+        systemInstruction: {
+          parts: [{ text: systemPrompt }]
+        }
+      };
+
+      // 指數退避重試機制 (1s, 2s)
+      let lastError = null;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          const result = await response.json();
+          const rawText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (!rawText) throw new Error('Empty AI response');
+
+          const cleanedJson = rawText.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+          const jsonMatch = cleanedJson.match(/\{[\s\S]*\}/);
+          const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : cleanedJson);
+          if (!parsed.name || !Array.isArray(parsed.menu) || parsed.menu.length === 0) {
+            throw new Error('Invalid JSON structure');
+          }
+          return parsed;
+        } catch (err) {
+          lastError = err;
+          if (attempt === 0) {
+            await new Promise(res => setTimeout(res, 1000));
+          }
+        }
+      }
+      throw lastError;
+    }
+
+    // 離線 / API 受限時的智慧備援解析引擎
+    function buildFallbackRestaurantData(name, url, notes) {
+      const combined = `${name} ${url} ${notes}`;
+      let category = '特色料理';
+      let priceRange = '280.00–580.00 元';
+      let speed = '現點現做（約 10–15 分鐘）';
+      let sampleDishes = [
+        { name: '主廚招牌精選套餐', calories: '560.00–720.00 kcal' },
+        { name: '人氣風味特調主食', calories: '480.00–640.00 kcal' },
+        { name: '季節鮮蔬暖心湯品', calories: '180.00–260.00 kcal' },
+        { name: '酥脆黃金招牌小點', calories: '320.00–440.00 kcal' },
+        { name: '特製秘醬風味料理', calories: '450.00–590.00 kcal' },
+        { name: '古早味手沖鮮果茶飲', calories: '120.00–190.00 kcal' }
+      ];
+
+      if (/鼎泰豐|小籠包|點心|湯包|港式|飲茶/i.test(combined)) {
+        category = '中式點心';
+        priceRange = '450.00–850.00 元';
+        speed = '現點現蒸職人手作（約 12–18 分鐘）';
+        sampleDishes = [
+          { name: '黃金十八摺小籠包', calories: '380.00–480.00 kcal' },
+          { name: '排骨蛋炒飯', calories: '650.00–820.00 kcal' },
+          { name: '蝦仁紅油抄手', calories: '340.00–450.00 kcal' },
+          { name: '元盅土雞湯', calories: '260.00–350.00 kcal' },
+          { name: '蟹粉小籠包', calories: '410.00–510.00 kcal' },
+          { name: '芋泥小籠包', calories: '310.00–400.00 kcal' }
+        ];
+      } else if (/火鍋|麻辣|涮涮|鍋物|石二鍋|海底撈|築間/i.test(combined)) {
+        category = '火鍋';
+        priceRange = '380.00–780.00 元';
+        speed = '桌邊現煮鍋物（自助吧無限享用）';
+        sampleDishes = [
+          { name: '招牌昆布鮮蔬鍋', calories: '520.00–680.00 kcal' },
+          { name: '四川麻辣雙拼鍋', calories: '690.00–890.00 kcal' },
+          { name: '特選雪花牛肉盤', calories: '440.00–580.00 kcal' },
+          { name: '極鮮海陸總匯拼盤', calories: '490.00–650.00 kcal' },
+          { name: '手打鮮蝦滑', calories: '210.00–290.00 kcal' },
+          { name: '老油條與麻辣鴨血', calories: '330.00–450.00 kcal' }
+        ];
+      } else if (/壽司|藏壽司|壽司郎|拉麵|日料|日本|丼飯|燒肉/i.test(combined)) {
+        category = '日式料理';
+        priceRange = '260.00–620.00 元';
+        speed = '職人現點現作 / 迴轉鮮食直送';
+        sampleDishes = [
+          { name: '炙燒鮭魚肚握壽司', calories: '240.00–320.00 kcal' },
+          { name: '特選鮪魚中腹盛合', calories: '280.00–360.00 kcal' },
+          { name: '濃厚豚骨叉燒拉麵', calories: '680.00–850.00 kcal' },
+          { name: '炸蝦天婦羅烏龍麵', calories: '540.00–690.00 kcal' },
+          { name: '北海道干貝茶碗蒸', calories: '150.00–210.00 kcal' },
+          { name: '宇治抹茶霜淇淋聖代', calories: '260.00–340.00 kcal' }
+        ];
+      } else if (/義大利麵|義式|披薩|pizza|pasta|牛排|早午餐|咖啡/i.test(combined)) {
+        category = '義式與西餐';
+        priceRange = '240.00–560.00 元';
+        speed = '現點現烹西式料理（約 12–15 分鐘）';
+        sampleDishes = [
+          { name: '松露奶油野菇燉飯', calories: '590.00–740.00 kcal' },
+          { name: '經典肉醬起司義大利麵', calories: '620.00–780.00 kcal' },
+          { name: '爐烤香草嫩雞排', calories: '510.00–660.00 kcal' },
+          { name: '瑪格麗特窯烤薄脆披薩', calories: '540.00–690.00 kcal' },
+          { name: '凱撒燻雞溫沙拉', calories: '280.00–380.00 kcal' },
+          { name: '提拉米蘇與美式咖啡', calories: '310.00–410.00 kcal' }
+        ];
+      }
+
+      // 嘗試從補充文字萃取地址
+      let extractedAddress = '238 新北市樹林區中山路一段100號（AI 依據分店區域整理）';
+      const addrMatch = notes.match(/([台臺][北中南東][市縣][^\s，。,；;]{4,24}|[新桃高基宜花屏苗彰雲嘉][北園雄隆蘭蓮東栗化林義][市縣][^\s，。,；;]{4,24})/);
+      if (addrMatch) {
+        extractedAddress = addrMatch[1];
+      } else if (name.includes('信義')) {
+        extractedAddress = '106 台北市大安區信義路二段194號';
+      } else if (name.includes('桃園')) {
+        extractedAddress = '330 桃園市桃園區中正路61號';
+      } else if (name.includes('屏東')) {
+        extractedAddress = '900 屏東縣屏東市民族路150號';
+      } else if (name.includes('高雄')) {
+        extractedAddress = '807 高雄市三民區博愛一路200號';
+      }
+
+      return {
+        name: name.trim(),
+        address: extractedAddress,
+        phone: '02-2321-8928',
+        priceRange,
+        walkTime: '步行 9 分鐘',
+        hours: '禮拜一到日 11:00-21:30',
+        speed,
+        signature: sampleDishes.slice(0, 3).map(d => d.name).join('、'),
+        category,
+        menu: sampleDishes
+      };
+    }
+
+    async function handleAiAddRestaurant(event) {
+      event.preventDefault();
+      const nameInput = document.getElementById('aiStoreNameInput');
+      const urlInput = document.getElementById('aiStoreUrlInput');
+      const notesInput = document.getElementById('aiStoreNotesInput');
+      const submitBtn = document.getElementById('aiGenerateBtn');
+      const loadingBox = document.getElementById('aiLoadingBox');
+      const loadingTitle = document.getElementById('aiLoadingTitle');
+
+      const storeName = nameInput.value.trim();
+      const storeUrl = urlInput.value.trim();
+      const storeNotes = notesInput.value.trim();
+
+      if (!storeName || !storeUrl) {
+        showToast('請完整填寫餐廳名稱與官方網頁網址！');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'AI 整理中...';
+      loadingTitle.textContent = `AI 正在解析「${storeName}」網頁與餐廳特色...`;
+      loadingBox.classList.remove('hidden');
+
+      let aiStructured = null;
+      try {
+        aiStructured = await fetchRestaurantInfoFromGemini(storeName, storeUrl, storeNotes);
+      } catch (e) {
+        // 無金鑰或網路限制時自動切換為智慧備援解析引擎
+        await new Promise(res => setTimeout(res, 750));
+        aiStructured = buildFallbackRestaurantData(storeName, storeUrl, storeNotes);
+      }
+
+      const newId = 'custom-' + Date.now();
+      const imgSet = getCategoryFoodImages(`${aiStructured.category || ''} ${aiStructured.name} ${storeNotes}`);
+      const dishesNormalized = (aiStructured.menu || []).slice(0, 6).map((item, idx) => ({
+        id: `${newId}-dish-${idx + 1}`,
+        name: item.name || `招牌料理 ${idx + 1}`,
+        calories: item.calories || '350.00–500.00 kcal',
+        image: imgSet.dishes[idx % imgSet.dishes.length]
+      }));
+
+      const newRestaurant = {
+        id: newId,
+        name: aiStructured.name || storeName,
+        address: aiStructured.address || '台灣（待補充詳細門牌）',
+        priceRange: aiStructured.priceRange || '250.00–550.00 元',
+        walkTime: aiStructured.walkTime || '步行 10 分鐘',
+        hours: aiStructured.hours || '禮拜一到日 11:00-21:30',
+        prepSpeed: aiStructured.speed || '現點現做',
+        signatureDish: aiStructured.signature || dishesNormalized.slice(0, 3).map(d => d.name).join('、'),
+        website: storeUrl,
+        phone: aiStructured.phone || '依門市公告為準',
+        mapQuery: aiStructured.address || storeName,
+        coverImage: imgSet.cover,
+        dishes: dishesNormalized
+      };
+
+      // 推入全域資料庫並同步更新全站 5 個視圖
+      restaurantsData.push(newRestaurant);
+      lastAddedStoreId = newId;
+
+      populateStoreSelect();
+      renderListView();
+      renderFavoritesView();
+      renderWheelView();
+      renderManageStoresList();
+      showAiPreviewCard(newRestaurant);
+
+      // 重設狀態與表單
+      loadingBox.classList.add('hidden');
+      submitBtn.disabled = false;
+      submitBtn.textContent = '✨ AI 自動整理並加入餐廳';
+      document.getElementById('aiAddRestaurantForm').reset();
+
+      showToast(`✨ AI 已成功將「${newRestaurant.name}」整理至餐廳與餐點頁面！`);
+    }
+
+    function showAiPreviewCard(store) {
+      const previewCard = document.getElementById('aiPreviewCard');
+      previewCard.classList.remove('hidden');
+
+      document.getElementById('aiPreviewImg').src = store.coverImage;
+      document.getElementById('aiPreviewName').textContent = store.name;
+      document.getElementById('aiPreviewAddress').textContent = `地址：${store.address}`;
+      document.getElementById('aiPreviewMetaLine').textContent = `參考消費：${store.priceRange} ｜ ${store.walkTime} ｜ 電話：${store.phone}`;
+      document.getElementById('aiPreviewHours').textContent = `營業時間：${store.hours}`;
+
+      document.getElementById('aiPreviewDishPills').innerHTML = store.dishes.map(d =>
+        `<span class="ai-dish-pill">🍽️ ${escapeHtml(d.name)}（${escapeHtml(d.calories)}）</span>`
+      ).join('');
+
+      document.getElementById('aiPreviewDetailBtn').onclick = () => openStoreDetail(store.id);
+      previewCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function renderManageStoresList() {
+      const container = document.getElementById('manageStoresList');
+      const countEl = document.getElementById('manageStoresCount');
+      if (!container) return;
+
+      countEl.textContent = `目前共 ${restaurantsData.length} 間餐廳`;
+
+      container.innerHTML = restaurantsData.map(store => {
+        const isBuiltin = BUILTIN_STORE_IDS.has(store.id);
+        const tagHtml = isBuiltin
+          ? `<span class="manage-store-tag builtin">預設收錄</span>`
+          : `<span class="manage-store-tag custom">AI 建檔新增</span>`;
+
+        const removeBtnHtml = isBuiltin
+          ? ''
+          : `<button type="button" class="btn-danger-outline" onclick="removeCustomRestaurant('${store.id}')">移除</button>`;
+
+        return `
+          <div class="manage-store-row">
+            <div class="manage-store-info">
+              <div style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:16px;color:var(--text-primary);margin-bottom:4px;">
+                ${escapeHtml(store.name)}${tagHtml}
+              </div>
+              <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.5;">
+                地址：${escapeHtml(store.address)} ｜ 共 ${store.dishes.length} 道餐點 ｜
+                <a href="${escapeHtml(store.website)}" target="_blank" rel="noopener noreferrer" class="official-link">來源網頁 ↗</a>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+              <button type="button" class="btn-secondary" style="padding:7px 14px;font-size:13px;" onclick="openStoreDetail('${store.id}')">
+                查看詳情
+              </button>
+              ${removeBtnHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function removeCustomRestaurant(storeId) {
+      if (BUILTIN_STORE_IDS.has(storeId)) return;
+      const idx = restaurantsData.findIndex(s => s.id === storeId);
+      if (idx === -1) return;
+
+      const removedName = restaurantsData[idx].name;
+      restaurantsData.splice(idx, 1);
+      favoriteIds.delete(storeId);
+
+      if (lastAddedStoreId === storeId) {
+        lastAddedStoreId = null;
+        document.getElementById('aiPreviewCard').classList.add('hidden');
+      }
+      if (lastWonStoreId === storeId) {
+        lastWonStoreId = null;
+        document.getElementById('wheelWinnerBox').classList.add('hidden');
+        document.getElementById('wheelResultInitialText').classList.remove('hidden');
+      }
+
+      populateStoreSelect();
+      renderListView();
+      renderFavoritesView();
+      renderWheelView();
+      renderManageStoresList();
+
+      showToast(`已移除自行新增的餐廳「${removedName}」`);
+    }
+
+    // =========================================================
+    // 10. Toast 提示與初始化
+    // =========================================================
+    let toastTimer = null;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastText').textContent = msg;
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2800);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      populateStoreSelect();
+      renderListView();
+      renderFavoritesView();
+      renderPublicReviews();
+      renderWheelView();
+      renderManageStoresList();
+    });
+  </script>
+</body>
+</html>
